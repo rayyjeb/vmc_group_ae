@@ -1,0 +1,42 @@
+{
+    "name": "vmc-backend",
+    "version": "1.0.0",
+    "description": "Backend API for VMC Group UAE Website",
+    "main": "src/server.js",
+    "scripts": {
+        "start": "node src/server.js",
+        "dev": "nodemon src/server.js",
+        "test": "jest",
+        "seed": "node src/scripts/seedDatabase.js"
+    },
+    "keywords": [
+        "vmc",
+        "backend",
+        "api",
+        "mongodb"
+    ],
+    "author": "VMC Group UAE",
+    "license": "MIT",
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "cloudinary": "^1.41.3",
+        "compression": "^1.8.1",
+        "cors": "^2.8.5",
+        "dotenv": "^16.6.1",
+        "express": "^4.21.2",
+        "express-rate-limit": "^7.5.1",
+        "express-validator": "^7.2.1",
+        "helmet": "^7.2.0",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.17.1",
+        "multer": "^1.4.5-lts.1",
+        "multer-storage-cloudinary": "^4.0.0"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "nodemon": "^3.1.10"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
