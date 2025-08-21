@@ -6,6 +6,7 @@
     "scripts": {
         "start": "node src/index.js",
         "dev": "nodemon src/index.js",
+        "vercel-build": "echo 'Build completed'",
         "test": "jest",
         "seed": "node src/scripts/seedDatabase.js"
     },
