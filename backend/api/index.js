@@ -4,6 +4,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
+const path = require("path");
 require("dotenv").config();
 
 const authRoutes = require("../src/routes/auth");
@@ -34,8 +35,8 @@ app.use(
   })
 );
 
-// Static files - serve uploaded images
-app.use("/uploads", express.static("uploads"));
+// Static files - serve uploaded images (fixed path)
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Health check endpoint
 app.get("/health", (req, res) => {
