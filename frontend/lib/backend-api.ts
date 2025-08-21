@@ -42,6 +42,19 @@ async function apiRequest<T>(
   }
 }
 
+// Helper function to build query parameters safely
+function buildQueryParams(params: Record<string, any>): URLSearchParams {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) {
+      searchParams.append(key, value.toString());
+    }
+  });
+
+  return searchParams;
+}
+
 // Public API functions (no authentication required)
 export const publicApi = {
   // Products
@@ -54,19 +67,15 @@ export const publicApi = {
     sort?: string;
     order?: "asc" | "desc";
   }): Promise<{ products: Product[]; pagination: any }> => {
-    const searchParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
-          searchParams.append(key, value.toString());
-        }
-      });
-    }
+    let endpoint = API_CONFIG.ENDPOINTS.PRODUCTS.BASE;
 
-    const queryString = searchParams.toString();
-    const endpoint = queryString
-      ? `${API_CONFIG.ENDPOINTS.PRODUCTS.BASE}?${queryString}`
-      : API_CONFIG.ENDPOINTS.PRODUCTS.BASE;
+    if (params) {
+      const searchParams = buildQueryParams(params);
+      const queryString = searchParams.toString();
+      if (queryString) {
+        endpoint = `${endpoint}?${queryString}`;
+      }
+    }
 
     return apiRequest(endpoint);
   },
@@ -88,12 +97,31 @@ export const publicApi = {
       "Full URL will be:",
       buildApiUrl(API_CONFIG.ENDPOINTS.CATEGORIES.BASE)
     );
-    const response = await apiRequest<{ categories: Category[] }>(
-      API_CONFIG.ENDPOINTS.CATEGORIES.BASE
-    );
-    console.log("getCategories response:", response);
-    // The apiRequest function already extracts data.data, so response should be { categories: [...] }
-    return response.categories || [];
+
+    try {
+      const response = await apiRequest<
+        Category[] | { categories: Category[] }
+      >(API_CONFIG.ENDPOINTS.CATEGORIES.BASE);
+
+      console.log("getCategories response:", response);
+
+      // Handle different response formats
+      if (Array.isArray(response)) {
+        return response;
+      } else if (
+        response &&
+        typeof response === "object" &&
+        "categories" in response
+      ) {
+        return (response as { categories: Category[] }).categories || [];
+      } else {
+        console.warn("Unexpected categories response format:", response);
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      return [];
+    }
   },
 
   getCategory: async (id: string): Promise<Category> => {
@@ -130,21 +158,17 @@ export const adminApi = {
   // Products (Admin)
   getProducts: async (
     token: string,
-    params?: any
+    params?: Record<string, any>
   ): Promise<{ products: AdminProduct[]; pagination: any }> => {
-    const searchParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
-          searchParams.append(key, value.toString());
-        }
-      });
-    }
+    let endpoint = API_CONFIG.ENDPOINTS.PRODUCTS.BASE;
 
-    const queryString = searchParams.toString();
-    const endpoint = queryString
-      ? `${API_CONFIG.ENDPOINTS.PRODUCTS.BASE}?${queryString}`
-      : API_CONFIG.ENDPOINTS.PRODUCTS.BASE;
+    if (params) {
+      const searchParams = buildQueryParams(params);
+      const queryString = searchParams.toString();
+      if (queryString) {
+        endpoint = `${endpoint}?${queryString}`;
+      }
+    }
 
     return apiRequest(endpoint, {
       headers: getAuthHeaders(token),

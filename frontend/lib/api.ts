@@ -97,17 +97,17 @@ export const categoryApi = {
   },
 
   // Get subcategories
-  getSubcategories: async (
-    categoryId: string
-  ): Promise<Category["subcategories"]> => {
-    try {
-      const category = await publicApi.getCategory(categoryId);
-      return category?.subcategories || [];
-    } catch (error) {
-      console.error("Failed to fetch subcategories:", error);
-      return [];
-    }
-  },
+  // getSubcategories: async (
+  //   categoryId: string
+  // ): Promise<Category["subcategories"]> => {
+  //   try {
+  //     const category = await publicApi.getCategory(categoryId);
+  //     return category?.subcategories || [];
+  //   } catch (error) {
+  //     console.error("Failed to fetch subcategories:", error);
+  //     return [];
+  //   }
+  // },
 };
 
 // Brand-related API functions

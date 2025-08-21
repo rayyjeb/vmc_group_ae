@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       "images.ctfassets.net",
       "blogstudio.s3.theshoppad.net",
       "localhost", // Add localhost for development
+      "res.cloudinary.com" 
     ],
     remotePatterns: [
       {

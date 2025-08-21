@@ -54,7 +54,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     </div>
 
                     <CardContent className="p-4 flex flex-col flex-1">
-                        <div className="flex items-center justify-between">
+                        {/* <div className="flex items-center justify-between">
                             <div className="flex items-center text-sm mb-1 text-amber-500">
                                 <Star className="h-4 w-4 fill-current mr-1" />
                                 <span>{productRating.toFixed(1)}</span>
@@ -62,7 +62,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                             <div className="text-sm text-muted-foreground">
                                 {productStock > 0 ? 'In Stock' : 'Out of Stock'}
                             </div>
-                        </div>
+                        </div> */}
 
                         <h3 className="font-medium mt-1">{productName}</h3>
 

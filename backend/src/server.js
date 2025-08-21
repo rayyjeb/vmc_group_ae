@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 8000;
 app.use(helmet());
 app.use(compression());
 
-// Rate limiting
+// Rate limiting (commented out for debugging)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
@@ -38,24 +38,6 @@ app.use(
   })
 );
 
-// Body parsing middleware - only for routes that need JSON
-app.use("/api/auth", express.json({ limit: "10mb" }));
-app.use("/api/auth", express.urlencoded({ extended: true, limit: "10mb" }));
-
-// Add JSON parsing for all API routes
-app.use("/api", express.json({ limit: "10mb" }));
-app.use("/api", express.urlencoded({ extended: true, limit: "10mb" }));
-
-// Add form data parsing for routes that handle file uploads
-app.use("/api/products", express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(
-  "/api/categories",
-  express.urlencoded({ extended: true, limit: "10mb" })
-);
-
-// For routes that handle file uploads, don't add JSON parsing middleware
-// The upload middleware will handle the multipart form data
-
 // Static files - serve uploaded images
 app.use("/uploads", express.static("uploads"));
 
@@ -68,11 +50,25 @@ app.get("/health", (req, res) => {
   });
 });
 
+// IMPORTANT: Register upload routes FIRST, without JSON parsing middleware
+// This prevents conflicts between express.json() and multer
+app.use("/api/upload", uploadRoutes);
+
+// Now apply JSON parsing middleware to other routes that need it
+app.use("/api/auth", express.json({ limit: "10mb" }));
+app.use("/api/auth", express.urlencoded({ extended: true, limit: "10mb" }));
+
+app.use("/api/products", express.json({ limit: "10mb" }));
+app.use("/api/products", express.urlencoded({ extended: true, limit: "10mb" }));
+
+app.use("/api/categories", express.json({ limit: "10mb" }));
+app.use("/api/categories", express.urlencoded({ extended: true, limit: "10mb" }));
+
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
-app.use("/api/upload", uploadRoutes);
+// Upload routes already registered above
 
 // 404 handler
 app.use("*", (req, res) => {
@@ -92,7 +88,7 @@ mongoose
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📊 Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log(`�� Health check: http://localhost:${PORT}/health`);
+      console.log(`🏥 Health check: http://localhost:${PORT}/health`);
     });
   })
   .catch((error) => {

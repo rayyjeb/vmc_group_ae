@@ -1,5 +1,4 @@
 "use client";
-
 import { useDataQuery, useDataMutation, useInvalidateQueries } from "./hooks";
 import {
   productApi,
@@ -20,11 +19,14 @@ export function useProduct(id: string) {
   });
 }
 
-export function useProductsByCategory(categoryId: string) {
+export function useProductsByCategory(categoryId: string, options?: any) {
   return useDataQuery(
     ["products", "category", categoryId],
     () => productApi.getByCategory(categoryId),
-    { enabled: !!categoryId }
+    { 
+      enabled: !!categoryId,
+      ...options
+    }
   );
 }
 
@@ -39,7 +41,6 @@ export function useSearchProducts(query: string) {
 // Product mutation hooks
 export function useCreateProduct() {
   const { invalidateQueries } = useInvalidateQueries();
-
   return useDataMutation(productApi.create, {
     onSuccess: () => {
       invalidateQueries(["products"]);
@@ -49,7 +50,6 @@ export function useCreateProduct() {
 
 export function useUpdateProduct() {
   const { invalidateQueries } = useInvalidateQueries();
-
   return useDataMutation(
     ({ id, product }: { id: string; product: any }) =>
       productApi.update(id, product),
@@ -64,7 +64,6 @@ export function useUpdateProduct() {
 
 export function useDeleteProduct() {
   const { invalidateQueries } = useInvalidateQueries();
-
   return useDataMutation(productApi.delete, {
     onSuccess: () => {
       invalidateQueries(["products"]);
@@ -83,13 +82,13 @@ export function useCategory(id: string) {
   });
 }
 
-export function useSubcategories(categoryId: string) {
-  return useDataQuery(
-    ["categories", categoryId, "subcategories"],
-    () => categoryApi.getSubcategories(categoryId),
-    { enabled: !!categoryId }
-  );
-}
+// export function useSubcategories(categoryId: string) {
+//   return useDataQuery(
+//     ["categories", categoryId, "subcategories"],
+//     () => categoryApi.getSubcategories(categoryId),
+//     { enabled: !!categoryId }
+//   );
+// }
 
 // Brand query hooks
 export function useBrands() {

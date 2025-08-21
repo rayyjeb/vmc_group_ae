@@ -273,6 +273,89 @@ router.put(
   }
 );
 
+// @route   PATCH /api/products/:id
+// @desc    Partially update product (JSON only)
+// @access  Private (Admin only)
+router.patch(
+  "/:id",
+  auth,
+  adminOnly,
+  express.json({ limit: "10mb" }),
+  [
+    body("name").optional().trim().isLength({ min: 1, max: 100 }),
+    body("description").optional().trim().isLength({ min: 1, max: 1000 }),
+    body("category").optional().isMongoId(),
+    body("stock").optional().isInt({ min: 0 }),
+    body("featured").optional().isBoolean(),
+    body("image").optional().isString(), // Accept base64 or URL string
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          errors: errors.array(),
+        });
+      }
+
+      const product = await Product.findById(req.params.id);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+
+      // Only include fields that are actually provided in the request
+      const updateData = {};
+      const allowedFields = ['name', 'description', 'category', 'stock', 'featured', 'image'];
+      
+      allowedFields.forEach(field => {
+        if (req.body.hasOwnProperty(field)) {
+          updateData[field] = req.body[field];
+        }
+      });
+
+      // Parse numeric fields if provided
+      if (updateData.hasOwnProperty('stock')) {
+        updateData.stock = parseInt(updateData.stock);
+      }
+
+      // Ensure boolean conversion for featured if provided
+      if (updateData.hasOwnProperty('featured')) {
+        updateData.featured = Boolean(updateData.featured);
+      }
+
+      const updatedProduct = await Product.findByIdAndUpdate(
+        req.params.id,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      ).populate("category", "name");
+
+      // Transform the product to include id field
+      const productObj = updatedProduct.toObject();
+      const transformedProduct = {
+        ...productObj,
+        id: productObj._id.toString(),
+        rating: productObj.rating || 0,
+      };
+
+      res.json({
+        success: true,
+        message: "Product updated successfully",
+        data: { product: transformedProduct },
+      });
+    } catch (error) {
+      console.error("Patch product error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server error while updating product",
+      });
+    }
+  }
+);
+
 // @route   DELETE /api/products/:id
 // @desc    Delete product
 // @access  Private (Admin only)

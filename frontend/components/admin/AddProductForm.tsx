@@ -35,11 +35,6 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
     useEffect(() => {
         // Check authentication first
         const token = localStorage.getItem("adminToken");
-        console.log("🔐 Auth check:", {
-            hasToken: !!token,
-            tokenLength: token?.length,
-            tokenPreview: token ? `${token.substring(0, 20)}...` : 'None'
-        });
 
         if (!token) {
             console.error("❌ No admin token found! Please log in first.");
@@ -51,17 +46,13 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
             return;
         }
 
-        console.log("✅ Token found, fetching categories...");
         fetchCategories();
     }, []);
 
     const fetchCategories = async () => {
         try {
             const token = localStorage.getItem("adminToken");
-            console.log("🔑 Fetching categories with token:", token ? "Present" : "Missing");
-
             const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/categories`;
-            console.log("🌐 Categories API URL:", apiUrl);
 
             const response = await fetch(apiUrl, {
                 headers: {
@@ -70,9 +61,6 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                 },
             });
 
-            console.log("📡 Categories response status:", response.status);
-            console.log("📡 Categories response headers:", response.headers);
-
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error("❌ Categories API error:", response.status, errorText);
@@ -80,11 +68,9 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
             }
 
             const data = await response.json();
-            console.log("📦 Categories response data:", data);
 
             if (data.success) {
                 setCategories(Array.isArray(data.data) ? data.data : []);
-                console.log("✅ Categories set:", Array.isArray(data.data) ? data.data : []);
             } else {
                 console.error("❌ Categories API error:", data.message);
                 setCategories([]);
@@ -97,27 +83,94 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        
+        // Validate required fields
+        if (!formData.name?.trim()) {
+            toast({
+                title: "Validation Error",
+                description: "Product name is required",
+                variant: "destructive",
+            });
+            return;
+        }
+        
+        if (!formData.description?.trim()) {
+            toast({
+                title: "Validation Error",
+                description: "Product description is required",
+                variant: "destructive",
+            });
+            return;
+        }
+        
+        if (!formData.category) {
+            toast({
+                title: "Validation Error",
+                description: "Please select a category",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        if (!formData.images || formData.images.length === 0) {
+            toast({
+                title: "Validation Error",
+                description: "Please upload at least one product image",
+                variant: "destructive",
+            });
+            return;
+        }
+
         setIsLoading(true);
 
         try {
             const token = localStorage.getItem("adminToken");
+            
+            if (!token) {
+                throw new Error("Authentication required. Please log in again.");
+            }
+            
+            // Use the first image as the main image if not set
+            const mainImage = formData.image || formData.images[0];
+            
+            const productData = {
+                name: formData.name.trim(),
+                description: formData.description.trim(),
+                category: formData.category,
+                image: mainImage,
+                images: formData.images,
+                stock: parseInt(formData.stock.toString()) || 0,
+                featured: formData.featured,
+            };
+
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/products`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({
-                    ...formData,
-                    stock: parseInt(formData.stock.toString()),
-                    image: formData.image,
-                    images: formData.images,
-                }),
+                body: JSON.stringify(productData),
             });
+
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("❌ Product creation failed:", response.status, errorText);
+                
+                if (response.status === 401) {
+                    localStorage.removeItem("adminToken");
+                    throw new Error("Session expired. Please log in again.");
+                }
+                
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
 
             const data = await response.json();
 
             if (data.success) {
+                // Reset form
                 setFormData({
                     name: "",
                     description: "",
@@ -127,23 +180,27 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                     stock: 0,
                     featured: false,
                 });
+                
                 onProductAdded();
+                
                 toast({
                     title: "Success",
                     description: "Product added successfully!",
                 });
             } else {
-                toast({
-                    title: "Error",
-                    description: data.message || "Failed to add product",
-                    variant: "destructive",
-                });
+                throw new Error(data.message || "Failed to add product");
             }
         } catch (error) {
-            console.error("Error adding product:", error);
+            console.error("💥 Error adding product:", error);
+            
+            let errorMessage = "Something went wrong. Please try again.";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            
             toast({
                 title: "Error",
-                description: "Something went wrong. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -159,11 +216,12 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
         }));
     };
 
-    const handleImageUploaded = (imageUrl: string) => {
+    // Updated to handle both single image and all images array
+    const handleImageUploaded = (imageUrl: string, allImages: string[]) => {
         setFormData(prev => ({
             ...prev,
-            image: imageUrl,
-            images: imageUrl ? [imageUrl] : []
+            image: imageUrl || allImages[allImages.length - 1] || "", // Use latest image as main
+            images: allImages
         }));
     };
 
@@ -187,6 +245,20 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                                 onChange={handleInputChange}
                                 required
                                 maxLength={100}
+                                placeholder="Enter product name"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="stock">Stock Quantity *</Label>
+                            <Input
+                                id="stock"
+                                name="stock"
+                                type="number"
+                                min="0"
+                                value={formData.stock}
+                                onChange={handleInputChange}
+                                required
+                                placeholder="0"
                             />
                         </div>
                     </div>
@@ -201,6 +273,7 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                             required
                             maxLength={1000}
                             rows={3}
+                            placeholder="Enter product description"
                         />
                     </div>
 
@@ -212,7 +285,7 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                             value={formData.category}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                             <option value="">Select a category</option>
                             {Array.isArray(categories) && categories.map((category) => (
@@ -221,19 +294,11 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                                 </option>
                             ))}
                         </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="stock">Stock Quantity *</Label>
-                        <Input
-                            id="stock"
-                            name="stock"
-                            type="number"
-                            min="0"
-                            value={formData.stock}
-                            onChange={handleInputChange}
-                            required
-                        />
+                        {categories.length === 0 && (
+                            <p className="text-xs text-gray-500">
+                                Loading categories...
+                            </p>
+                        )}
                     </div>
 
                     <ImageUpload
@@ -250,10 +315,16 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                             onChange={handleInputChange}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
-                        <Label htmlFor="featured">Featured Product</Label>
+                        <Label htmlFor="featured" className="text-sm font-medium">
+                            Featured Product
+                        </Label>
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isLoading || formData.images.length === 0}
+                    >
                         {isLoading ? "Adding Product..." : "Add Product"}
                     </Button>
                 </form>
