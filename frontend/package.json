@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "build": "tsc",
+    "lint": "eslint . --ext .ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
