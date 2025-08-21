@@ -2,10 +2,10 @@
     "name": "vmc-backend",
     "version": "1.0.0",
     "description": "Backend API for VMC Group UAE Website",
-    "main": "src/server.js",
+    "main": "src/index.js",
     "scripts": {
-        "start": "node src/server.js",
-        "dev": "nodemon src/server.js",
+        "start": "node src/index.js",
+        "dev": "nodemon src/index.js",
         "test": "jest",
         "seed": "node src/scripts/seedDatabase.js"
     },
