@@ -3,7 +3,13 @@ import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } fro
 import { useState } from 'react';
 
 export default function ProductsList() {
-    const [newProduct, setNewProduct] = useState({ name: '', category: '' });
+    const [newProduct, setNewProduct] = useState({ 
+        name: '', 
+        category: '', 
+        description: '', 
+        image: '', 
+        stock: 0 
+    });
     const [editingProduct, setEditingProduct] = useState<any>(null);
 
     // Query hooks
@@ -18,7 +24,13 @@ export default function ProductsList() {
         e.preventDefault();
         createProductMutation.mutate(newProduct, {
             onSuccess: () => {
-                setNewProduct({ name: '', category: '' });
+                setNewProduct({ 
+                    name: '', 
+                    category: '', 
+                    description: '', 
+                    image: '', 
+                    stock: 0 
+                });
             },
         });
     };
@@ -71,6 +83,37 @@ export default function ProductsList() {
                             value={newProduct.category}
                             onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
                             className="w-full p-2 border rounded"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <textarea
+                            placeholder="Description"
+                            value={newProduct.description}
+                            onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                            className="w-full p-2 border rounded"
+                            rows={3}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            placeholder="Image URL"
+                            value={newProduct.image}
+                            onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+                            className="w-full p-2 border rounded"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="number"
+                            placeholder="Stock"
+                            value={newProduct.stock}
+                            onChange={(e) => setNewProduct({ ...newProduct, stock: parseInt(e.target.value) || 0 })}
+                            className="w-full p-2 border rounded"
+                            min="0"
                             required
                         />
                     </div>

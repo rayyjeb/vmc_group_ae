@@ -81,7 +81,7 @@ const CartDrawer = () => {
                                                 <div className="flex flex-1 flex-col">
                                                     <div className="flex justify-between">
                                                         <h3 className="text-sm font-medium">{item.name}</h3>
-                                                        <button onClick={() => removeFromCart(item.id)} className="text-muted-foreground hover:text-destructive">
+                                                        <button onClick={() => removeFromCart(item.id || item._id || '')} className="text-muted-foreground hover:text-destructive">
                                                             <X className="h-4 w-4" />
                                                         </button>
                                                     </div>
@@ -92,7 +92,7 @@ const CartDrawer = () => {
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-8 w-8 rounded-none rounded-l-md p-0"
-                                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                                onClick={() => updateQuantity(item.id || item._id || '', item.quantity - 1)}
                                                             >
                                                                 <Minus className="h-3 w-3" />
                                                             </Button>
@@ -101,7 +101,7 @@ const CartDrawer = () => {
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-8 w-8 rounded-none rounded-r-md p-0"
-                                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                                onClick={() => updateQuantity(item.id || item._id || '', item.quantity + 1)}
                                                             >
                                                                 <Plus className="h-3 w-3" />
                                                             </Button>
