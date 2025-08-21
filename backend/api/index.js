@@ -6,14 +6,13 @@ const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
-const authRoutes = require("./routes/auth");
-const productRoutes = require("./routes/products");
-const categoryRoutes = require("./routes/categories");
-const uploadRoutes = require("./routes/upload");
-const { errorHandler } = require("./middleware/errorHandler");
+const authRoutes = require("../src/routes/auth");
+const productRoutes = require("../src/routes/products");
+const categoryRoutes = require("../src/routes/categories");
+const uploadRoutes = require("../src/routes/upload");
+const { errorHandler } = require("../src/middleware/errorHandler");
 
 const app = express();
-const PORT = process.env.PORT || 8000;
 
 // Security middleware
 app.use(helmet());
@@ -30,10 +29,7 @@ app.use("/api/", limiter);
 // CORS configuration
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? ["https://yourdomain.com"]
-        : ["http://localhost:3000", "http://localhost:3001"],
+    origin: true, // Allow all origins for now
     credentials: true,
   })
 );
@@ -62,13 +58,15 @@ app.use("/api/products", express.json({ limit: "10mb" }));
 app.use("/api/products", express.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use("/api/categories", express.json({ limit: "10mb" }));
-app.use("/api/categories", express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(
+  "/api/categories",
+  express.urlencoded({ extended: true, limit: "10mb" })
+);
 
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
-// Upload routes already registered above
 
 // 404 handler
 app.use("*", (req, res) => {
@@ -83,34 +81,10 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("✅ Connected to MongoDB successfully");
-
-    // Start server after DB connection
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📊 Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-    });
   })
   .catch((error) => {
     console.error("❌ MongoDB connection error:", error);
-    process.exit(1);
   });
 
-// Graceful shutdown
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received, shutting down gracefully");
-  mongoose.connection.close(() => {
-    console.log("MongoDB connection closed");
-    process.exit(0);
-  });
-});
-
-process.on("SIGINT", () => {
-  console.log("SIGINT received, shutting down gracefully");
-  mongoose.connection.close(() => {
-    console.log("MongoDB connection closed");
-    process.exit(0);
-  });
-});
-
+// Export for Vercel
 module.exports = app;

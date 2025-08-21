@@ -2,9 +2,9 @@
     "name": "vmc-backend",
     "version": "1.0.0",
     "description": "Backend API for VMC Group UAE Website",
-    "main": "src/index.js",
+    "main": "api/index.js",
     "scripts": {
-        "start": "node src/index.js",
+        "start": "node api/index.js",
         "dev": "nodemon src/index.js",
         "vercel-build": "echo 'Build completed'",
         "test": "jest",
