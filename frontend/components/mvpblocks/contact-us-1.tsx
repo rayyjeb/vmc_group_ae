@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Check, Loader2, Mail, Phone } from 'lucide-react';
 import { Input } from '../ui/input';
@@ -9,6 +9,7 @@ import { SparklesCore } from '../ui/sparkles';
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import Earth from '../ui/globe';
+import emailjs from 'emailjs-com';
 
 export default function ContactUs1() {
   const [name, setName] = useState('');
@@ -20,23 +21,46 @@ export default function ContactUs1() {
   const formRef = useRef(null);
   const isInView = useInView(formRef, { once: true, amount: 0.3 });
 
+  // Initialize EmailJS
+  useEffect(() => {
+    emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Perform form submission logic here
-      console.log('Form submitted:', { name, email, message });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // EmailJS template parameters
+      const templateParams = {
+        from_name: name,
+        from_email: email,
+        message: message,
+        to_name: 'VMC Group UAE', // Your company name
+      };
+
+      // Send email using EmailJS
+      const response = await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        templateParams
+      );
+
+      console.log('Email sent successfully:', response);
+
+      // Reset form
       setName('');
       setEmail('');
       setMessage('');
       setIsSubmitted(true);
+
+      // Hide success message after 5 seconds
       setTimeout(() => {
         setIsSubmitted(false);
       }, 5000);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('Error sending email:', error);
+      // You can add error handling here (show error toast, etc.)
     } finally {
       setIsSubmitting(false);
     }

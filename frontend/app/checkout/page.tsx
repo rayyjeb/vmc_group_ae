@@ -92,10 +92,10 @@ const CheckoutPage = () => {
         };
         // Send email using EmailJS with the updated cartItems data
         emailjs.send(
-            'service_ra5q1dg',
-            'template_sjfyfzz',
+            'service_5kf63d4',
+            'template_kx1f24t',
             emailData,
-            'MlcjcWPprc-EiZMsC'
+            'Ygj4UFhStyz6pQQPq'
         )
             .then(
                 (response) => {
@@ -122,7 +122,7 @@ const CheckoutPage = () => {
 
     if (isComplete) {
         return (
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col pt-14">
                 <main className="flex-1 container mx-auto px-4 py-12">
                     <div className="max-w-lg mx-auto text-center py-12">
                         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
