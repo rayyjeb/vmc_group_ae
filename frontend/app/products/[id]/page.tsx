@@ -1,16 +1,15 @@
 "use client"
 import { useEffect } from 'react';
-import { useProduct, useProductsByCategory } from '@/lib/queries';
+import { useProduct } from '@/lib/queries';
 import { Check, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import ProductCard from '@/components/ui/product-card';
 import ShareButton from '@/components/ui/share';
 import { useParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
-import { Product } from '@/types/products';
+import FeaturedProductsSlider from '@/components/ui/featured-products-slider';
 
 const ProductPage = () => {
     const params = useParams();
@@ -19,7 +18,6 @@ const ProductPage = () => {
 
     // Use React Query hooks for data fetching
     const { data: product, isLoading, error } = useProduct(productId);
-    const { data: relatedProducts = [] } = useProductsByCategory(product?.category || '');
 
     useEffect(() => {
         if (product) {
@@ -79,11 +77,6 @@ const ProductPage = () => {
             </div>
         );
     }
-
-    // Filter out current product and limit related products
-    const filteredRelatedProducts = relatedProducts
-        .filter((item: { id: string }) => item.id !== productId)
-        .slice(0, 4);
 
     return (
         <div className="min-h-screen flex flex-col pt-12">
@@ -163,18 +156,8 @@ const ProductPage = () => {
                     </div>
 
                     <Separator className="my-12" />
-
                     {/* Related Products */}
-                    {filteredRelatedProducts.length > 0 && (
-                        <div className="mt-16">
-                            <h2 className="text-2xl font-bold mb-6">Related Products</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                {filteredRelatedProducts.map((relatedProduct: Product) => (
-                                    <ProductCard key={relatedProduct.id} product={relatedProduct} />
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    <FeaturedProductsSlider />
                 </div>
             </main>
         </div>

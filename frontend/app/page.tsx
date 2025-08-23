@@ -15,8 +15,8 @@ export default function Home() {
       <Hero />
       <Slider />
       <AboutUs />
-      <FeaturedProducts />
       <ServicesNew />
+      <FeaturedProducts />
       <Brands />
       <Industries />
       {/* <TrustIndicators/> */}

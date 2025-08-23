@@ -50,8 +50,8 @@ export default function Hero() {
                         <Button
                             asChild
                             size="sm">
-                            <Link href="/contact-us">
-                                <span>Contact Us</span>
+                            <Link href="/products">
+                                <span>View Products</span>
                             </Link>
                         </Button>
                         <Button

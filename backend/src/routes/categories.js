@@ -11,11 +11,7 @@ const router = express.Router();
 // @access  Public
 router.get("/", async (req, res) => {
   try {
-    console.log(" Categories request received");
-    console.log("👤 User:", req.user);
-
     const categories = await Category.find({}).sort({ name: 1 });
-    console.log("✅ Found categories:", categories.length);
 
     res.json({
       success: true,
@@ -23,7 +19,6 @@ router.get("/", async (req, res) => {
       data: categories,
     });
   } catch (error) {
-    console.error("❌ Categories error:", error);
     res.status(500).json({
       success: false,
       message: "Error retrieving categories",

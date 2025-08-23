@@ -54,22 +54,6 @@ const ProductsPageContent = () => {
     error: categoryProductsError,
   } = useProductsByCategory(activeCategory || "");
 
-  useEffect(() => {
-    console.log("Categories data:", categories);
-    console.log("Categories error:", categoriesError);
-    console.log("Categories loading:", isLoadingCategories);
-    console.log("Categories length:", categories?.length);
-    console.log("Active category:", activeCategory);
-    console.log("Category products:", categoryProducts);
-    console.log("All products:", allProducts);
-  }, [
-    categories,
-    categoriesError,
-    isLoadingCategories,
-    activeCategory,
-    categoryProducts,
-    allProducts,
-  ]);
 
   // Update activeCategory when URL changes
   useEffect(() => {
@@ -105,11 +89,9 @@ const ProductsPageContent = () => {
     if (activeCategory) {
       // Use category-specific products
       products = categoryProducts || [];
-      console.log("Using category products:", products.length);
     } else {
       // Use all products
       products = allProducts || [];
-      console.log("Using all products:", products.length);
     }
 
     // Apply search filter if there's a search query
@@ -136,7 +118,6 @@ const ProductsPageContent = () => {
       });
     }
 
-    console.log("Filtered products:", products.length);
     return products;
   };
 

@@ -95,9 +95,8 @@ const FeaturedProductsSlider = ({
             {[...Array(3)].map((_, i) => (
               <div key={i} className="bg-white rounded-lg p-4 animate-pulse">
                 <div
-                  className={`${
-                    compact ? "aspect-[4/3]" : "aspect-square"
-                  } bg-gray-200 rounded mb-3`}
+                  className={`${compact ? "aspect-[4/3]" : "aspect-square"
+                    } bg-gray-200 rounded mb-3`}
                 ></div>
                 <div className="h-4 bg-gray-200 rounded mb-2"></div>
                 <div className="h-3 bg-gray-200 rounded w-2/3"></div>
@@ -120,9 +119,8 @@ const FeaturedProductsSlider = ({
         {title && (
           <div className="flex items-center justify-between mb-8">
             <h2
-              className={`${
-                compact ? "text-2xl" : "text-3xl"
-              } font-bold text-gray-900 font-DIN tracking-tight`}
+              className={`${compact ? "text-2xl" : "text-3xl"
+                } text-custom-text-100  tracking-tighter `}
             >
               {title}
             </h2>
@@ -170,17 +168,15 @@ const FeaturedProductsSlider = ({
                       <Card className="group h-full bg-white hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-gray-200">
                         <CardContent className="p-0">
                           <div
-                            className={`flex ${
-                              compact ? "flex-row" : "flex-col"
-                            } h-full`}
+                            className={`flex ${compact ? "flex-row" : "flex-col"
+                              } h-full`}
                           >
                             {/* Image */}
                             <div
-                              className={`relative overflow-hidden bg-gray-50 ${
-                                compact
+                              className={`relative overflow-hidden bg-gray-50 ${compact
                                   ? "w-32 h-32 flex-shrink-0"
                                   : "aspect-[4/3] w-full"
-                              }`}
+                                }`}
                             >
                               <Image
                                 src={productImage}
@@ -200,23 +196,20 @@ const FeaturedProductsSlider = ({
 
                             {/* Content */}
                             <div
-                              className={`flex flex-col justify-between ${
-                                compact ? "flex-1 p-4" : "p-4"
-                              }`}
+                              className={`flex flex-col justify-between ${compact ? "flex-1 p-4" : "p-4"
+                                }`}
                             >
                               <div className="flex-1">
                                 <h3
-                                  className={`font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand transition-colors ${
-                                    compact ? "text-sm" : "text-base"
-                                  }`}
+                                  className={`font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand transition-colors ${compact ? "text-sm" : "text-base"
+                                    }`}
                                 >
                                   {productName}
                                 </h3>
 
                                 <p
-                                  className={`text-gray-600 line-clamp-2 mb-3 ${
-                                    compact ? "text-xs" : "text-sm"
-                                  }`}
+                                  className={`text-gray-600 line-clamp-2 mb-3 ${compact ? "text-xs" : "text-sm"
+                                    }`}
                                 >
                                   {productDescription}
                                 </p>
@@ -228,11 +221,10 @@ const FeaturedProductsSlider = ({
                                   isProductInCart ? "default" : "secondary"
                                 }
                                 size={compact ? "sm" : "sm"}
-                                className={`w-full mt-auto transition-all duration-300 ease-in-out transform hover:scale-105 ${
-                                  !isProductInCart && productStock > 0 
-                                    ? "hover:!bg-[#92C33E] hover:!text-white hover:!border-[#92C33E]" 
+                                className={`w-full mt-auto transition-all duration-300 ease-in-out transform hover:scale-105 ${!isProductInCart && productStock > 0
+                                    ? "hover:!bg-[#92C33E] hover:!text-white hover:!border-[#92C33E]"
                                     : ""
-                                }`}
+                                  }`}
                                 onClick={(e) => handleAddToCart(e, product)}
                                 disabled={productStock === 0}
                               >

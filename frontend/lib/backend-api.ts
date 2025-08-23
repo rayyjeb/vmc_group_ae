@@ -89,21 +89,12 @@ export const publicApi = {
 
   // Categories
   getCategories: async (): Promise<Category[]> => {
-    console.log(
-      "Calling getCategories with endpoint:",
-      API_CONFIG.ENDPOINTS.CATEGORIES.BASE
-    );
-    console.log(
-      "Full URL will be:",
-      buildApiUrl(API_CONFIG.ENDPOINTS.CATEGORIES.BASE)
-    );
 
     try {
       const response = await apiRequest<
         Category[] | { categories: Category[] }
       >(API_CONFIG.ENDPOINTS.CATEGORIES.BASE);
 
-      console.log("getCategories response:", response);
 
       // Handle different response formats
       if (Array.isArray(response)) {

@@ -43,9 +43,6 @@ export const API_CONFIG = {
 // Helper function to build full API URL
 export const buildApiUrl = (endpoint: string): string => {
   const fullUrl = `${API_CONFIG.BASE_URL}${endpoint}`;
-  console.log('API URL being built:', fullUrl);
-  console.log('BASE_URL from config:', API_CONFIG.BASE_URL);
-  console.log('Environment variable:', process.env.NEXT_PUBLIC_API_URL);
   return fullUrl;
 };
 

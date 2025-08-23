@@ -22,11 +22,11 @@ interface Product {
   name: string;
   description: string;
   category:
-    | {
-        _id: string;
-        name: string;
-      }
-    | string;
+  | {
+    _id: string;
+    name: string;
+  }
+  | string;
   image: string;
   stock: number;
   featured: boolean;
@@ -75,28 +75,25 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const apiUrl = `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      }/api/products`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/products`;
 
       const [productsRes, categoriesRes] = await Promise.all([
         fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
           }/api/products`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         ),
         fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
           }/api/categories`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         )
-        
+
       ]);
 
       const productsData = await productsRes.json();
@@ -106,7 +103,6 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         totalProducts: productsData.data?.products?.length || 0,
         totalCategories: categoriesData.data?.length || 0,
       });
-      console.log(categoriesData);
     } catch (error) {
       console.error("Error fetching stats:", error);
       toast({
@@ -121,9 +117,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const apiUrl = `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      }/api/products`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/products`;
 
       const response = await fetch(apiUrl, {
         headers: { Authorization: `Bearer ${token}` },
@@ -149,9 +144,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const apiUrl = `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      }/api/categories`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/api/categories`;
 
       const response = await fetch(apiUrl, {
         headers: {
@@ -247,8 +241,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       }
 
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/api/products/${editingProduct._id}`,
         {
           method: "PATCH",
@@ -297,8 +290,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const token = localStorage.getItem("adminToken");
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/api/products/${productId}`,
         {
           method: "DELETE",
@@ -339,8 +331,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const token = localStorage.getItem("adminToken");
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/api/products/${productId}`,
         {
           method: "PATCH",
@@ -357,9 +348,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       if (data.success) {
         toast({
           title: "Success",
-          description: `Product ${
-            !currentFeatured ? "marked as" : "unmarked from"
-          } featured!`,
+          description: `Product ${!currentFeatured ? "marked as" : "unmarked from"
+            } featured!`,
         });
         fetchStats();
         fetchProducts();
@@ -398,21 +388,19 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="flex space-x-8">
             <button
               onClick={() => setActiveTab("products")}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "products"
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "products"
                   ? "border-blue-500 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
+                }`}
             >
               Products
             </button>
             <button
               onClick={() => setActiveTab("add-product")}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "add-product"
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "add-product"
                   ? "border-blue-500 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
+                }`}
             >
               Add Product
             </button>

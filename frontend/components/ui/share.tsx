@@ -20,16 +20,14 @@ const ShareButton = () => {
           url: currentUrl,
         });
       } catch (error) {
-        console.log('Error sharing:', error);
+        console.error('Error sharing:', error);
       }
     } else {
       // Fallback for browsers that don't support Web Share API
       try {
         await navigator.clipboard.writeText(currentUrl);
-        // You could add a toast notification here
-        console.log('URL copied to clipboard');
       } catch (error) {
-        console.log('Error copying to clipboard:', error);
+        console.error('Error copying to clipboard:', error);
       }
     }
   };

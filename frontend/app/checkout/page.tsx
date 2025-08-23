@@ -68,8 +68,6 @@ const CheckoutPage = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onSubmit = (data: any) => {
         setIsSubmitting(true);
-        console.log("onSubmit called");
-        console.log("Form Data:", data);
         if (Object.keys(data).length === 0) {
             console.error("No data to submit");
             return;

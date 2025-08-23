@@ -97,21 +97,11 @@ const seedDatabase = async () => {
         featured: true,
       },
     ]);
-    console.log("📦 Created products:", products.length);
 
-    console.log("🎉 Database seeded successfully!");
-    console.log("\n📊 Summary:");
-    console.log(`- Admin users: 1`);
-    console.log(`- Categories: ${categories.length}`);
-    console.log(`- Products: ${products.length}`);
-    console.log("\n🔑 Default admin credentials:");
-    console.log(`Email: ${process.env.ADMIN_EMAIL || "admin@vmcgroup.com"}`);
-    console.log(`Password: ${process.env.ADMIN_PASSWORD || "admin123"}`);
   } catch (error) {
     console.error("❌ Error seeding database:", error);
   } finally {
     await mongoose.connection.close();
-    console.log("�� MongoDB connection closed");
     process.exit(0);
   }
 };
