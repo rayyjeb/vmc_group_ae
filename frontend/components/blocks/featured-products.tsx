@@ -41,11 +41,37 @@ const FeaturedProducts = ({
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   // Filter and limit products
   const featuredProducts = allProducts
     .filter((product: Product) => (showFeaturedOnly ? product.featured : true))
     .slice(0, maxProducts);
+
+  // Auto-play functionality
+  useEffect(() => {
+    if (!api || !isAutoPlaying) return;
+
+    const interval = setInterval(() => {
+      if (api.canScrollNext()) {
+        api.scrollNext();
+      } else {
+        // Reset to beginning when reaching the end
+        api.scrollTo(0);
+      }
+    }, 1500); // Change slide every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [api, isAutoPlaying]);
+
+  // Pause auto-play on hover
+  const handleMouseEnter = () => {
+    setIsAutoPlaying(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsAutoPlaying(true);
+  };
 
   // Update scroll state when API changes
   useEffect(() => {
@@ -132,7 +158,11 @@ const FeaturedProducts = ({
           {subtitle}
         </motion.p>
         {/* Carousel */}
-        <div className="relative">
+        <div
+          className="relative"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
           <Carousel
             opts={{
               align: "start",

@@ -9,7 +9,6 @@ import ShareButton from '@/components/ui/share';
 import { useParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
-import FeaturedProductsSlider from '@/components/ui/featured-products-slider';
 import RelatedProducts from '@/components/ui/related-products';
 import CustomisationSection from '@/components/blocks/customisation';
 
