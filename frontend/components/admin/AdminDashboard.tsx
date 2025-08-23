@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, LogOut, Trash2 } from "lucide-react";
 import AddProductForm from "./AddProductForm";
 
 interface AdminDashboardProps {
@@ -376,7 +376,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <h1 className="text-2xl font-bold text-gray-900">Product Dashboard</h1>
-            <Button onClick={onLogout} variant="outline">
+            <Button onClick={onLogout} variant="outline" className="text-sm font-medium text-red-500">
+              <LogOut className="w-4 h-4 mr-1" />
               Logout
             </Button>
           </div>
@@ -389,8 +390,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <button
               onClick={() => setActiveTab("products")}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "products"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
             >
               Products
@@ -398,8 +399,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <button
               onClick={() => setActiveTab("add-product")}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "add-product"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
             >
               Add Product
@@ -469,11 +470,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     products.map((product) => (
                       <Card key={product._id}>
                         <CardContent className="p-4">
-                          <div className="flex items-start space-x-4">
+                          <div className="flex gap-4 flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
                             <Image
                               src={product.image}
                               alt={product.name}
-                              className="w-20 h-20 object-cover rounded-md"
+                              className="w-20 h-20 object-cover rounded-md mx-auto sm:mx-0"
                               width={80}
                               height={80}
                               onError={(e) => {
@@ -482,7 +483,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                               }}
                             />
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between">
+                              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
                                 <div className="flex-1">
                                   <h3 className="text-lg font-semibold text-gray-900 truncate">
                                     {product.name}
@@ -490,7 +491,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                   <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                                     {product.description}
                                   </p>
-                                  <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-2 text-sm text-gray-500">
                                     <span>Stock: {product.stock}</span>
                                     <span>
                                       Category:{" "}
@@ -499,9 +500,9 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                         : product.category.name}
                                     </span>
                                   </div>
-                                  <div className="flex items-center space-x-2 mt-2">
+                                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-2">
                                     {product.featured && (
-                                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 w-fit">
                                         Featured
                                       </span>
                                     )}
@@ -511,10 +512,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                     </span>
                                   </div>
                                 </div>
-                                <div className="flex flex-col flex-wrap gap-2 ml-4 min-w-[200px] justify-center items-end">
+                                <div className="flex flex-col sm:flex-row lg:flex-col gap-2 lg:ml-4 lg:min-w-[200px] lg:justify-center lg:items-end">
                                   <Button
                                     size="sm"
-                                    className="flex items-center w-1/2"
+                                    className="flex items-center w-full sm:w-auto lg:w-1/2"
                                     onClick={() => handleEditClick(product)}
                                   >
                                     <Edit2 className="w-4 h-4 mr-1" />
@@ -522,7 +523,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                   </Button>
                                   <Button
                                     size="sm"
-                                    className="flex items-center w-1/2"
+                                    className="flex items-center w-full sm:w-auto lg:w-1/2"
                                     onClick={() =>
                                       handleToggleFeatured(
                                         product._id,
@@ -535,7 +536,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                   <Button
                                     size="sm"
                                     variant="destructive"
-                                    className="flex items-center w-1/2 text-white"
+                                    className="flex items-center w-full sm:w-auto lg:w-1/2 text-white"
                                     onClick={() => handleDeleteProduct(product._id)}
                                   >
                                     <Trash2 className="w-4 h-4 mr-1 " />

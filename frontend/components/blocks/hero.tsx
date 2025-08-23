@@ -68,7 +68,7 @@ export default function Hero() {
                             asChild
                             size="sm">
                             <Link href="/products">
-                                <span >View Products</span>
+                                <span className="font-medium" >View Products</span>
                             </Link>
                         </Button>
                         <Button
@@ -77,7 +77,7 @@ export default function Hero() {
                             variant={"outline"}
                         >
                             <Link href="about-us">
-                                <span>Know more</span>
+                                <span className="font-medium">Know more</span>
                             </Link>
                         </Button>
                     </div>

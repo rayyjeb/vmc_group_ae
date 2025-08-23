@@ -12,8 +12,8 @@ const features = [
         title: 'Food Packaging Solutions',
         description: 'Custom and standard packaging solutions for all your food products with eco-friendly options.',
         images: ['/Packages.webp', '/package.webp', '/thermo.webp'],
-        link: '/services/food-packaging',
-        buttonText: 'Learn More',
+        link: '/products?category=68a46af2977d8d4329e0bb7c',
+        buttonText: 'View Products',
         tags: [
             { icon: '🥡', label: 'Eco-friendly' },
             { icon: '📦', label: 'Custom Sizes' },
@@ -32,8 +32,8 @@ const features = [
         title: 'Frozen Food Distribution',
         description: 'Complete cold chain management and distribution across UAE and GCC countries.',
         images: ['/meat.webp', '/fries.webp', '/eggs.webp'],
-        link: '/services/frozen-food-distribution',
-        buttonText: 'Learn More',
+        link: '/products?category=68a70a8949dfd59b50c389b9',
+        buttonText: 'View Products',
         tags: [
             { icon: '❄️', label: 'Cold Chain' },
             { icon: '🚚', label: 'Logistics' },
@@ -52,8 +52,8 @@ const features = [
         title: 'Raw Food Supply',
         description: 'Bulk and wholesale supply of premium quality raw food ingredients.',
         images: ['/pista.webp', '/rice.webp'],
-        link: '/services/raw-food-supply',
-        buttonText: 'Learn More',
+        link: '/products?category=68a46af2977d8d4329e0bb7a',
+        buttonText: 'View Products',
         tags: [
             { icon: '🌾', label: 'Bulk Supply' },
             { icon: '🥦', label: 'Fresh Ingredients' },
@@ -72,8 +72,8 @@ const features = [
         title: 'Daily Essentials',
         description: 'Bulk supply and private label solutions for daily essentials such as detergents, toilet paper, tissues, and cleaning products.',
         images: ['/tissue.webp', '/detergent.webp'],
-        link: '/services/daily-essentials',
-        buttonText: 'Learn More',
+        link: '/products?category=68a46af2977d8d4329e0bb7b',
+        buttonText: 'View Products',
         tags: [
             { icon: '🧻', label: 'Toilet Paper' },
             { icon: '🧴', label: 'Detergents' },
@@ -92,8 +92,8 @@ const features = [
         title: 'Import/Export Services',
         description: 'Facilitating international trade with comprehensive import/export solutions.',
         images: ['/VAN3.webp', '/carton.webp'],
-        link: '/services/import-export',
-        buttonText: 'Learn More',
+        link: '/about-us',
+        buttonText: 'Know More',
         tags: [
             { icon: '🌍', label: 'Global Reach' },
             { icon: '🛳️', label: 'Shipping' },
@@ -203,9 +203,9 @@ const ServicesNew = () => {
                                         ))}
                                     </div>
                                 </div>
-                                <Link href={"/contact-us"}>
+                                <Link href={feature.link}>
                                     <Button className='w-fit'>
-                                        Get Quote
+                                        {feature.buttonText}
                                     </Button>
                                 </Link>
                             </div>

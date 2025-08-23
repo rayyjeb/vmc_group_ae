@@ -80,7 +80,7 @@ const brands = [
 const BrandGallery = () => {
     return (
         <main className="bg-white min-h-screen pt-48">
-            <section className="container mx-auto px-4">
+            <section className="container mx-auto px-4 py-4">
                 <div className="mb-12 text-center">
                     <h1 className="text-4xl md:text-5xl tracking-tighter text-custom-text-100 mb-4">
                         Our Brand Gallery

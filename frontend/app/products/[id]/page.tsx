@@ -11,6 +11,7 @@ import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
 import FeaturedProductsSlider from '@/components/ui/featured-products-slider';
 import RelatedProducts from '@/components/ui/related-products';
+import CustomisationSection from '@/components/blocks/customisation';
 
 const ProductPage = () => {
     const params = useParams();
@@ -116,7 +117,7 @@ const ProductPage = () => {
                                 )}
                             </div>
 
-                            <h1 className="text-3xl font-bold tracking-tight font-Urbanist">{product.name}</h1>
+                            <h1 className="text-4xl font-medium tracking-tighter font-Urbanist">{product.name}</h1>
                             <div className="mt-4">
                                 <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                     {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
@@ -167,6 +168,8 @@ const ProductPage = () => {
                         </div>
                     </div>
 
+                    <Separator className='mt-10'/>
+                    <CustomisationSection />
                     <Separator className="my-12" />
                     {/* Related Products */}
                     {/* <FeaturedProductsSlider /> */}

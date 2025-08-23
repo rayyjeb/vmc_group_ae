@@ -73,7 +73,7 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="admin@vmcgroup.com"
+                                placeholder="Enter your email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -98,12 +98,6 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
                             {isLoading ? "Signing in..." : "Sign In"}
                         </Button>
                     </form>
-
-                    <div className="mt-4 text-center text-sm text-gray-600">
-                        <p>Default credentials:</p>
-                        <p>Email: admin@vmcgroup.com</p>
-                        <p>Password: admin123</p>
-                    </div>
                 </CardContent>
             </Card>
         </div>

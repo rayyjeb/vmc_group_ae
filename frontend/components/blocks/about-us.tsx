@@ -70,7 +70,7 @@ export default function AboutUs() {
                         </div>
                         <Link href={"/about-us"}>
                             <Button className="w-fit mt-6">
-                                View More
+                                <span>Know More</span>
                             </Button>
                         </Link>
                     </div>
