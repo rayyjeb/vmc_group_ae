@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import HeaderWrapper from "@/components/shared/HeaderWrapper";
 import QueryProvider from "@/components/providers/query-provider";
 import CartDrawer from "@/components/ui/cart-drawer";
+import Footer4Col from "@/components/mvpblocks/footer-4col";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
           <CartProvider>
             <HeaderWrapper />
             {children}
+            <Footer4Col/>
             <CartDrawer />
             <Toaster />
           </CartProvider>

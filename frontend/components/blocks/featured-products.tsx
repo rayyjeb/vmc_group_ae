@@ -18,6 +18,8 @@ import {
 import { ChevronRight, ShoppingCart, Check, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import Highlight from "../ui/highlights";
 
 interface FeaturedProductsProps {
   title?: string;
@@ -29,7 +31,7 @@ interface FeaturedProductsProps {
 
 const FeaturedProducts = ({
   title = "Featured Products",
-  subtitle = "Discover our handpicked selection of premium tools and equipment",
+  subtitle = "Discover our best selling products",
   maxProducts = 8,
   showFeaturedOnly = true,
   className = "",
@@ -80,7 +82,7 @@ const FeaturedProducts = ({
   if (isLoading) {
     return (
       <section
-        className={`py-16 bg-gradient-to-br from-gray-50 to-white ${className}`}
+        className={`py-16 bg ${className}`}
       >
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -108,17 +110,27 @@ const FeaturedProducts = ({
 
   return (
     <section
-      className={`py-16 bg-gradient-to-br from-gray-50 to-white ${className}`}
+      className={`py-16 bg-background ${className}`}
     >
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl text-custom-text-100 tracking-tighter my-4">
-            {title}
-          </h2>
-          <p className="text-custom-text-200 text-base mb-10">{subtitle}</p>
-        </div>
-
+        <Highlight text='THE BEST SINCE 2008' className='mb-2' />
+        <motion.h2
+          className="text-4xl md:text-5xl text-custom-text-100  tracking-tighter text-left mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {title}
+        </motion.h2>
+        <motion.p
+          className='text-custom-text-200 text-base mb-20'
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7 }}
+        >
+          {subtitle}
+        </motion.p>
         {/* Carousel */}
         <div className="relative">
           <Carousel
@@ -162,38 +174,11 @@ const FeaturedProducts = ({
                             {/* Badges */}
                             <div className="absolute top-3 right-3 flex flex-col gap-2">
                               {isFeatured && (
-                                <Badge className="bg-gradient-to-r from-orange-400 to-amber-500 text-white border-0 shadow-lg">
+                                <Badge className="bg-brand text-white border-0 shadow-lg">
                                   ⭐ Featured
                                 </Badge>
                               )}
-                              
-                            </div>
 
-                            {/* Overlay with quick actions */}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                className={`bg-white/90 text-gray-900 shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 ${
-                                  !isProductInCart && productStock > 0
-                                    ? "hover:!bg-[#92C33E] hover:!text-white hover:!border-[#92C33E]"
-                                    : "hover:bg-white"
-                                }`}
-                                onClick={(e) => handleAddToCart(e, product)}
-                                disabled={productStock === 0}
-                              >
-                                {isProductInCart ? (
-                                  <>
-                                    <Check className="h-4 w-4 mr-2" />
-                                    Added
-                                  </>
-                                ) : (
-                                  <>
-                                    <ShoppingCart className="h-4 w-4 mr-2" />
-                                    Quick Add
-                                  </>
-                                )}
-                              </Button>
                             </div>
                           </div>
 
@@ -205,11 +190,10 @@ const FeaturedProducts = ({
                                   {[...Array(5)].map((_, i) => (
                                     <Star
                                       key={i}
-                                      className={`h-3 w-3 ${
-                                        i < Math.floor(productRating)
-                                          ? "fill-current"
-                                          : "text-gray-300"
-                                      }`}
+                                      className={`h-3 w-3 ${i < Math.floor(productRating)
+                                        ? "fill-current"
+                                        : "text-gray-300"
+                                        }`}
                                     />
                                   ))}
                                 </div>
@@ -236,11 +220,10 @@ const FeaturedProducts = ({
                                 isProductInCart ? "default" : "secondary"
                               }
                               size="sm"
-                              className={`w-full transition-all duration-300 hover:scale-105 ${
-                                !isProductInCart && productStock > 0
-                                  ? "hover:!bg-[#92C33E] hover:!text-white hover:!border-[#92C33E]"
-                                  : ""
-                              }`}
+                              className={`w-full transition-all duration-300 hover:scale-105 ${!isProductInCart && productStock > 0
+                                ? "hover:!bg-[#92C33E] hover:!text-white hover:!border-[#92C33E]"
+                                : ""
+                                }`}
                               onClick={(e) => handleAddToCart(e, product)}
                               disabled={productStock === 0}
                             >
@@ -284,9 +267,9 @@ const FeaturedProducts = ({
         <div className="text-center mt-12">
           <Link href="/products">
             <Button
-              variant="outline"
-              size="lg"
-              className="bg-white hover:bg-brand hover:text-white border-2 border-brand text-brand transition-all duration-300 px-8 py-3 text-lg font-medium"
+              variant="default"
+              size="sm"
+              className="bg-white hover:bg-[#92C33E]/20 hover:text-white border-2 border-brand text-brand transition-all duration-300 px-8 py-3 text-lg font-medium"
             >
               View All Products
               <ChevronRight className="ml-2 h-5 w-5" />

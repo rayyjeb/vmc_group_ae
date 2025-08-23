@@ -10,7 +10,6 @@ import {
 import { Product } from "@/types/products";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
-import Footer4Col from "@/components/mvpblocks/footer-4col";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductCard from "@/components/ui/product-card";
 import { ProductGridSkeleton } from "@/components/ui/ProductSkeleton";
@@ -206,7 +205,6 @@ const ProductsPage = () => {
             </div>
           </div>
         </main>
-        <Footer4Col />
       </div>
     );
   }
@@ -409,7 +407,6 @@ const ProductsPage = () => {
           )}
         </div>
       </main>
-      <Footer4Col />
     </div>
   );
 };
