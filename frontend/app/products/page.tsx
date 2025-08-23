@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   useProducts,
@@ -16,7 +16,8 @@ import { ProductGridSkeleton } from "@/components/ui/ProductSkeleton";
 
 const PRODUCTS_PER_PAGE = 40;
 
-const ProductsPage = () => {
+// Create a separate component that uses useSearchParams
+const ProductsPageContent = () => {
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get("category");
 
@@ -220,10 +221,9 @@ const ProductsPage = () => {
               </h1>
               <p className="text-muted-foreground mt-2 transition-all duration-300">
                 {activeCategory
-                  ? `Browse our complete collection of ${
-                      getCategoryName(activeCategory)?.toLowerCase() ||
-                      "products"
-                    }`
+                  ? `Browse our complete collection of ${getCategoryName(activeCategory)?.toLowerCase() ||
+                  "products"
+                  }`
                   : "Browse our complete collection of professional tools and equipment"}
               </p>
               {(activeCategory || debouncedSearchQuery) && (
@@ -282,15 +282,15 @@ const ProductsPage = () => {
                   </TabsTrigger>
                   {categories && categories.length > 0
                     ? categories.map((category: any) => {
-                        const categoryId = category.id || category._id;
-                        const categoryName = category.name;
+                      const categoryId = category.id || category._id;
+                      const categoryName = category.name;
 
-                        return (
-                          <TabsTrigger key={categoryId} value={categoryId}>
-                            {categoryName}
-                          </TabsTrigger>
-                        );
-                      })
+                      return (
+                        <TabsTrigger key={categoryId} value={categoryId}>
+                          {categoryName}
+                        </TabsTrigger>
+                      );
+                    })
                     : null}
                 </TabsList>
               </Tabs>
@@ -382,8 +382,8 @@ const ProductsPage = () => {
                   {debouncedSearchQuery
                     ? `No products found matching "${debouncedSearchQuery}"`
                     : activeCategory
-                    ? `No products found in ${getCategoryName(activeCategory)}`
-                    : "No products available at the moment"}
+                      ? `No products found in ${getCategoryName(activeCategory)}`
+                      : "No products available at the moment"}
                 </p>
               </div>
               {(debouncedSearchQuery || activeCategory) && (
@@ -408,6 +408,15 @@ const ProductsPage = () => {
         </div>
       </main>
     </div>
+  );
+};
+
+// Main component with Suspense wrapper
+const ProductsPage = () => {
+  return (
+    <Suspense fallback={<ProductGridSkeleton count={12} />}>
+      <ProductsPageContent />
+    </Suspense>
   );
 };
 
