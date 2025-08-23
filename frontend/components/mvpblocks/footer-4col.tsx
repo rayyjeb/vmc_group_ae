@@ -11,20 +11,18 @@ const data = {
   githubLink: "https://github.com/mvpblocks",
   dribbbleLink: "https://dribbble.com/mvpblocks",
   services: {
-    webdev: "/web-development",
-    webdesign: "/web-design",
-    marketing: "/marketing",
-    googleads: "/google-ads",
+    webdev: "/products?category=68a46af2977d8d4329e0bb7c",
+    webdesign: "products?category=68a70a8949dfd59b50c389b9",
+    marketing: "/products?category=68a46af2977d8d4329e0bb7a",
+    googleads: "/products?category=68a46af2977d8d4329e0bb7b",
   },
   about: {
-    history: "/company-history",
-    team: "/meet-the-team",
-    handbook: "/employee-handbook",
-    careers: "/careers",
+    history: "/about-us",
+    team: "/about-us",
   },
   help: {
     faqs: "/faqs",
-    support: "/support",
+    support: "/contact-us",
     livechat: "/live-chat",
   },
   contact: {
@@ -51,7 +49,6 @@ const data = {
 const aboutLinks = [
   { text: "Company History", href: data.about.history },
   { text: "About Us", href: data.about.team },
-  { text: "Careers", href: data.about.careers },
 ];
 
 const serviceLinks = [
@@ -62,7 +59,6 @@ const serviceLinks = [
 ];
 
 const helpfulLinks = [
-  { text: "FAQs", href: data.help.faqs },
   { text: "Support", href: data.help.support },
 ];
 
@@ -107,9 +103,9 @@ export default function Footer4Col() {
             <div className="text-center sm:text-left">
               <p className="text-lg font-medium">About Us</p>
               <ul className="mt-8 space-y-4 text-sm">
-                {aboutLinks.map(({ text }) => (
+                {aboutLinks.map(({ text, href }) => (
                   <li key={text}>
-                    <a className="text-secondary-foreground/70 transition">
+                    <a href={href} className="text-secondary-foreground/70 transition">
                       {text}
                     </a>
                   </li>
@@ -120,9 +116,9 @@ export default function Footer4Col() {
             <div className="text-center sm:text-left">
               <p className="text-lg font-medium">Our Services</p>
               <ul className="mt-8 space-y-4 text-sm">
-                {serviceLinks.map(({ text }) => (
+                {serviceLinks.map(({ text, href }) => (
                   <li key={text}>
-                    <a className="text-secondary-foreground/70 transition">
+                    <a href={href} className="text-secondary-foreground/70 transition">
                       {text}
                     </a>
                   </li>
@@ -133,9 +129,9 @@ export default function Footer4Col() {
             <div className="text-center sm:text-left">
               <p className="text-lg font-medium">Helpful Links</p>
               <ul className="mt-8 space-y-4 text-sm">
-                {helpfulLinks.map(({ text }) => (
+                {helpfulLinks.map(({ text, href }) => (
                   <li key={text}>
-                    <a
+                    <a href={href}
                       className="text-secondary-foreground/70 transition"
                     >
                       <span className="text-secondary-foreground/70 transition">{text}</span>

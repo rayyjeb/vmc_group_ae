@@ -1,7 +1,7 @@
 "use client"
 import { useEffect } from 'react';
 import { useProduct } from '@/lib/queries';
-import { Check, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Check, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
 import RelatedProducts from '@/components/ui/related-products';
 import CustomisationSection from '@/components/blocks/customisation';
+import Link from 'next/link';
 
 const ProductPage = () => {
     const params = useParams();
@@ -100,6 +101,12 @@ const ProductPage = () => {
                         {/* Product Info - All content in one column on desktop */}
                         <div className="animate-slide-in order-1 lg:order-2 space-y-6">
                             {/* Badges - Mobile First */}
+                            <div className='flex lg:hidden items-center gap-2'>
+                                <ArrowLeft className='w-4 h-4 text-muted-foreground' />
+                                <Link href="/products" className='text-sm text-muted-foreground'>
+                                    Back to Products
+                                </Link>
+                            </div>
                             <div className="flex items-center space-x-2 mb-4">
                                 <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
                                     {typeof product.category === 'string'
@@ -167,7 +174,7 @@ const ProductPage = () => {
                         </div>
                     </div>
 
-                    <Separator className='mt-10'/>
+                    <Separator className='mt-10' />
                     <CustomisationSection />
                     <Separator className="my-12" />
                     {/* Related Products */}

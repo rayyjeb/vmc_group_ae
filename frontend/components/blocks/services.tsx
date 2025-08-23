@@ -5,7 +5,7 @@ import ServiceCard from '../shared/service'
 const Services = () => {
     return (
         <div className='bg-accent h-full mt-24'>
-            <div className='container mx-auto pt-24'>
+            <div className='container mx-auto lg:pt-24'>
                 <div className='flex flex-col gap-4 text-white '>
                     <Highlight text="OUR SERVICES" />
                     <h1 className='text-5xl'> We bring the best solutions <br /> when it comes to food</h1>

@@ -5,7 +5,7 @@ import Image from 'next/image'
 const CustomisationSection = () => {
   return (
     <div className='mt-24'>
-      <div className='container mx-auto pt-24'>
+      <div className='container mx-auto lg:pt-24'>
         <div className='flex flex-col lg:flex-row gap-8 items-center'>
           {/* Text content on the left */}
           <div className='flex-1 flex flex-col gap-4'>
