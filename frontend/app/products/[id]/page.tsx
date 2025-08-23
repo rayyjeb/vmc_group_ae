@@ -10,6 +10,7 @@ import { useParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
 import FeaturedProductsSlider from '@/components/ui/featured-products-slider';
+import RelatedProducts from '@/components/ui/related-products';
 
 const ProductPage = () => {
     const params = useParams();
@@ -168,7 +169,8 @@ const ProductPage = () => {
 
                     <Separator className="my-12" />
                     {/* Related Products */}
-                    <FeaturedProductsSlider />
+                    {/* <FeaturedProductsSlider /> */}
+                    <RelatedProducts currentProduct={product} />
                 </div>
             </main>
         </div>
