@@ -1,5 +1,6 @@
 import AboutUs from "@/components/blocks/about-us";
 import Brands from "@/components/blocks/brands";
+import FeaturedProducts from "@/components/blocks/featured-products";
 import Hero from "@/components/blocks/hero";
 import Industries from "@/components/blocks/industries";
 import ServicesNew from "@/components/blocks/services-v3";
@@ -14,6 +15,7 @@ export default function Home() {
       <Hero />
       <Slider />
       <AboutUs />
+      <FeaturedProducts />
       <ServicesNew />
       <Brands />
       <Industries />

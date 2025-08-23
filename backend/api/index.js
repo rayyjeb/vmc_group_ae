@@ -39,7 +39,7 @@ app.use(
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Health check endpoint
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
   res.status(200).json({
     status: "OK",
     message: "VMC Group UAE Backend is running",
@@ -70,7 +70,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 
 // 404 handler
-app.use("*", (req, res) => {
+app.use("*", (_req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 

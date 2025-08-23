@@ -1,4 +1,5 @@
 "use client";
+import { useMemo } from "react";
 import { useDataQuery, useDataMutation, useInvalidateQueries } from "./hooks";
 import {
   productApi,
@@ -10,7 +11,10 @@ import {
 
 // Product query hooks
 export function useProducts() {
-  return useDataQuery(["products"], productApi.getAll);
+  return useDataQuery(["products"], productApi.getAll, {
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in newer versions)
+  });
 }
 
 export function useProduct(id: string) {
@@ -19,23 +23,57 @@ export function useProduct(id: string) {
   });
 }
 
+// Optimized: Use cached products data instead of separate API calls
 export function useProductsByCategory(categoryId: string, options?: any) {
-  return useDataQuery(
-    ["products", "category", categoryId],
-    () => productApi.getByCategory(categoryId),
-    { 
-      enabled: !!categoryId,
-      ...options
-    }
-  );
+  const { data: allProducts = [], isLoading: isLoadingAll, error } = useProducts();
+  
+  const filteredProducts = useMemo(() => {
+    if (!categoryId || !allProducts.length) return [];
+    return allProducts.filter((product: any) => {
+      const productCategoryId = typeof product.category === 'string' 
+        ? product.category 
+        : product.category?._id || product.category?.id;
+      return productCategoryId === categoryId;
+    });
+  }, [allProducts, categoryId]);
+
+  return {
+    data: filteredProducts,
+    isLoading: isLoadingAll,
+    error,
+    ...options
+  };
 }
 
 export function useSearchProducts(query: string) {
-  return useDataQuery(
-    ["products", "search", query],
-    () => productApi.search(query),
-    { enabled: !!query && query.length > 2 }
-  );
+  const { data: allProducts = [] } = useProducts();
+  
+  const searchResults = useMemo(() => {
+    if (!query || query.length < 2) return [];
+    
+    const searchTerm = query.toLowerCase();
+    return allProducts.filter((product: any) => {
+      const name = product.name?.toLowerCase() || '';
+      const description = product.description?.toLowerCase() || '';
+      
+      let categoryText = '';
+      if (typeof product.category === 'string') {
+        categoryText = product.category.toLowerCase();
+      } else if (product.category && typeof product.category === 'object') {
+        categoryText = (product.category as any).name?.toLowerCase() || '';
+      }
+      
+      return name.includes(searchTerm) || 
+             description.includes(searchTerm) || 
+             categoryText.includes(searchTerm);
+    });
+  }, [allProducts, query]);
+
+  return {
+    data: searchResults,
+    isLoading: false, // Since we're using cached data
+    error: null
+  };
 }
 
 // Product mutation hooks
@@ -73,7 +111,10 @@ export function useDeleteProduct() {
 
 // Category query hooks
 export function useCategories() {
-  return useDataQuery(["categories"], categoryApi.getAll);
+  return useDataQuery(["categories"], categoryApi.getAll, {
+    staleTime: 10 * 60 * 1000, // 10 minutes - categories change less frequently
+    gcTime: 30 * 60 * 1000, // 30 minutes (renamed from cacheTime in newer versions)
+  });
 }
 
 export function useCategory(id: string) {

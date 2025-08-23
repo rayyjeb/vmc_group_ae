@@ -18,6 +18,12 @@ interface AddProductFormProps {
     onProductAdded: () => void;
 }
 
+interface UploadedImage {
+    id: string;
+    url: string;
+    status: 'uploading' | 'completed' | 'error';
+}
+
 export default function AddProductForm({ onProductAdded }: AddProductFormProps) {
     const [formData, setFormData] = useState({
         name: "",
@@ -28,6 +34,7 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
         stock: 0,
         featured: false,
     });
+    const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
@@ -113,10 +120,23 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
             return;
         }
 
-        if (!formData.images || formData.images.length === 0) {
+        // Check for completed images
+        const completedImages = uploadedImages.filter(img => img.status === 'completed');
+        if (completedImages.length === 0) {
             toast({
                 title: "Validation Error",
-                description: "Please upload at least one product image",
+                description: "Please wait for at least one image to finish uploading",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        // Check if any images are still uploading
+        const uploadingImages = uploadedImages.filter(img => img.status === 'uploading');
+        if (uploadingImages.length > 0) {
+            toast({
+                title: "Please wait",
+                description: `${uploadingImages.length} image(s) still uploading. Please wait for completion.`,
                 variant: "destructive",
             });
             return;
@@ -131,15 +151,16 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                 throw new Error("Authentication required. Please log in again.");
             }
             
-            // Use the first image as the main image if not set
-            const mainImage = formData.image || formData.images[0];
+            // Use completed images
+            const imageUrls = completedImages.map(img => img.url);
+            const mainImage = imageUrls[0]; // First completed image as main
             
             const productData = {
                 name: formData.name.trim(),
                 description: formData.description.trim(),
                 category: formData.category,
                 image: mainImage,
-                images: formData.images,
+                images: imageUrls,
                 stock: parseInt(formData.stock.toString()) || 0,
                 featured: formData.featured,
             };
@@ -180,6 +201,7 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                     stock: 0,
                     featured: false,
                 });
+                setUploadedImages([]);
                 
                 onProductAdded();
                 
@@ -216,12 +238,18 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
         }));
     };
 
-    // Updated to handle both single image and all images array
-    const handleImageUploaded = (imageUrl: string, allImages: string[]) => {
+    // Handle image changes from the new upload component
+    const handleImagesChange = (images: UploadedImage[]) => {
+        setUploadedImages(images);
+        
+        // Update form data with completed images
+        const completedImages = images.filter(img => img.status === 'completed');
+        const imageUrls = completedImages.map(img => img.url);
+        
         setFormData(prev => ({
             ...prev,
-            image: imageUrl || allImages[allImages.length - 1] || "", // Use latest image as main
-            images: allImages
+            image: imageUrls[0] || "",
+            images: imageUrls
         }));
     };
 
@@ -302,8 +330,8 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                     </div>
 
                     <ImageUpload
-                        onImageUploaded={handleImageUploaded}
-                        currentImage={formData.image}
+                        onImagesChange={handleImagesChange}
+                        currentImages={uploadedImages}
                     />
 
                     <div className="flex items-center space-x-2">
@@ -323,9 +351,18 @@ export default function AddProductForm({ onProductAdded }: AddProductFormProps) 
                     <Button 
                         type="submit" 
                         className="w-full" 
-                        disabled={isLoading || formData.images.length === 0}
+                        disabled={
+                            isLoading || 
+                            uploadedImages.filter(img => img.status === 'completed').length === 0 ||
+                            uploadedImages.some(img => img.status === 'uploading')
+                        }
                     >
-                        {isLoading ? "Adding Product..." : "Add Product"}
+                        {isLoading 
+                            ? "Adding Product..." 
+                            : uploadedImages.some(img => img.status === 'uploading')
+                            ? "Waiting for uploads..."
+                            : "Add Product"
+                        }
                     </Button>
                 </form>
             </CardContent>

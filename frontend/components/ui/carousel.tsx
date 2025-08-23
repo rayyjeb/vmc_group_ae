@@ -195,7 +195,7 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <ArrowLeft />
+      <ArrowLeft className="text-black"/>
       <span className="sr-only">Previous slide</span>
     </Button>
   )
@@ -212,7 +212,7 @@ function CarouselNext({
   return (
     <Button
       data-slot="carousel-next"
-      variant={variant}
+      
       size={size}
       className={cn(
         "absolute size-8 rounded-full",
@@ -225,7 +225,7 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <ArrowRight />
+      <ArrowRight className="text-black"/>
       <span className="sr-only">Next slide</span>
     </Button>
   )

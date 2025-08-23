@@ -1,37 +1,160 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, X, Image as ImageIcon, Trash2 } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Trash2, CheckCircle, Clock } from "lucide-react";
 
 interface ImageUploadProps {
-  onImageUploaded: (imageUrl: string, allImages: string[]) => void;
-  currentImage?: string;
+  onImagesChange: (images: UploadedImage[]) => void;
+  currentImages?: UploadedImage[];
   className?: string;
 }
 
+interface UploadedImage {
+  id: string;
+  url: string;
+  status: 'uploading' | 'completed' | 'error';
+  file?: File;
+  progress?: number;
+}
+
 export default function ImageUpload({
-  onImageUploaded,
-  currentImage,
+  onImagesChange,
+  currentImages = [],
   className = "",
 }: ImageUploadProps) {
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState<string[]>(
-    currentImage ? [currentImage] : []
-  );
+  const [images, setImages] = useState<UploadedImage[]>(currentImages);
   const [dragActive, setDragActive] = useState(false);
+  const [uploadQueue, setUploadQueue] = useState<File[]>([]);
+  const [isProcessingQueue, setIsProcessingQueue] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const handleFileUpload = async (file: File) => {
+  // Handle single file upload (defined as callback to avoid dependency issues)
+  const handleSingleFileUpload = useCallback(async (file: File) => {
+    try {
+      // Upload to Cloudinary
+      const cloudinaryUrl = await uploadToCloudinary(file);
+      
+      // Update the image with the actual Cloudinary URL and clean up blob URL
+      setImages(prev => prev.map(img => {
+        if (img.file === file) {
+          // Clean up the temporary object URL
+          if (img.url.startsWith('blob:')) {
+            URL.revokeObjectURL(img.url);
+          }
+          return { ...img, url: cloudinaryUrl, status: 'completed' as const, file: undefined };
+        }
+        return img;
+      }));
+      
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+    } catch (error) {
+      // Mark image as error but keep it in the list for retry
+      setImages(prev => prev.map(img => 
+        img.file === file 
+          ? { ...img, status: 'error' as const }
+          : img
+      ));
+      
+      const errorMessage = error instanceof Error ? error.message : "Upload failed. Please try again.";
+      toast({
+        title: "Upload failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
+  // Process upload queue one file at a time
+  useEffect(() => {
+    const processQueue = async () => {
+      if (isProcessingQueue || uploadQueue.length === 0) return;
+      
+      setIsProcessingQueue(true);
+      
+      const file = uploadQueue[0];
+      setUploadQueue(prev => prev.slice(1)); // Remove first file from queue
+      
+      await handleSingleFileUpload(file);
+      
+      // Small delay between uploads to prevent server overload
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setIsProcessingQueue(false);
+    };
+
+    processQueue();
+  }, [uploadQueue.length, isProcessingQueue, handleSingleFileUpload]);
+
+  // Notify parent when images change (using useEffect to avoid render-time updates)
+  useEffect(() => {
+    onImagesChange(images);
+  }, [images]); // Removed onImagesChange from deps to prevent infinite loops
+
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        throw new Error("Please log in to upload images");
+      }
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const apiUrl = `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+      }/api/upload/image`;
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem("adminToken");
+          throw new Error("Session expired. Please log in again.");
+        }
+        if (response.status === 413) {
+          throw new Error("File too large. Please choose a smaller image.");
+        }
+        throw new Error(`Upload failed (${response.status})`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        const imageUrl = data.data?.secure_url || data.data?.url || data.secure_url || data.url;
+        if (!imageUrl) {
+          throw new Error("No image URL received from server");
+        }
+        return imageUrl;
+      } else {
+        throw new Error(data.message || "Upload failed");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      throw error;
+    }
+  };
+
+  // Add files to upload queue instead of uploading immediately
+  const handleFileUpload = (file: File) => {
     if (!file) return;
 
     // Validate file type
     const allowedTypes = [
       "image/jpeg",
-      "image/jpg",
+      "image/jpg", 
       "image/png",
       "image/webp",
       "image/gif",
@@ -45,7 +168,7 @@ export default function ImageUpload({
       return;
     }
 
-    // Validate file size (10MB to match backend)
+    // Validate file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast({
         title: "File too large",
@@ -55,115 +178,38 @@ export default function ImageUpload({
       return;
     }
 
-    setIsUploading(true);
+    // Create a temporary image entry with queued status
+    const tempId = `temp-${Date.now()}-${Math.random()}`;
+    const tempImage: UploadedImage = {
+      id: tempId,
+      url: URL.createObjectURL(file), // Temporary preview URL
+      status: 'uploading',
+      file,
+      progress: 0
+    };
 
-    try {
-      // Get and validate token
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        throw new Error("Please log in to upload images");
-      }
+    // Add to images immediately for instant feedback
+    setImages(prev => [...prev, tempImage]);
+    
+    // Add to upload queue
+    setUploadQueue(prev => [...prev, file]);
+  };
 
-      // Create form data
-      const formData = new FormData();
-      formData.append("image", file);
 
-      const apiUrl = `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      }/api/upload/image`;
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Don't set Content-Type header - let the browser set it for FormData
-        },
-        body: formData,
-      });
+  const retryUpload = (imageId: string) => {
+    const image = images.find(img => img.id === imageId);
+    if (!image || !image.file) return;
 
-      // Get response text first to debug
-      const responseText = await response.text();
-
-      // Handle response
-      if (!response.ok) {
-        console.error("❌ Upload failed:", {
-          status: response.status,
-          statusText: response.statusText,
-          error: responseText,
-        });
-
-        if (response.status === 401) {
-          localStorage.removeItem("adminToken");
-          throw new Error("Session expired. Please log in again.");
-        }
-
-        if (response.status === 413) {
-          throw new Error("File too large. Please choose a smaller image.");
-        }
-
-        throw new Error(`Upload failed (${response.status}): ${responseText}`);
-      }
-
-      // Parse JSON response
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error("❌ Failed to parse response as JSON:", parseError);
-        throw new Error("Invalid response from server");
-      }
-
-      if (data.success) {
-        // Check for secure_url in different possible locations
-        let imageUrl = null;
-
-        if (data.data?.secure_url) {
-          imageUrl = data.data.secure_url;
-        } else if (data.data?.url) {
-          imageUrl = data.data.url;
-        } else if (data.secure_url) {
-          imageUrl = data.secure_url;
-        } else if (data.url) {
-          imageUrl = data.url;
-        }
-
-        if (imageUrl) {
-          const newImages = [...uploadedImages, imageUrl];
-          setUploadedImages(newImages);
-          onImageUploaded(imageUrl, newImages);
-
-          toast({
-            title: "Success",
-            description: "Image uploaded successfully",
-          });
-        } else {
-          console.error("❌ No image URL found in response:", data);
-          throw new Error("No image URL received from server");
-        }
-      } else {
-        console.error("❌ Upload failed:", data);
-        throw new Error(data.message || "Upload failed");
-      }
-    } catch (error) {
-      console.error("💥 Upload error:", error);
-
-      let errorMessage = "Upload failed. Please try again.";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      toast({
-        title: "Upload failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
+    // Update status to uploading
+    setImages(prev => prev.map(img => 
+      img.id === imageId 
+        ? { ...img, status: 'uploading' as const }
+        : img
+    ));
+    
+    // Add file back to upload queue
+    setUploadQueue(prev => [...prev, image.file!]);
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -181,28 +227,73 @@ export default function ImageUpload({
     e.stopPropagation();
     setDragActive(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileUpload(e.dataTransfer.files[0]);
-    }
+    const files = Array.from(e.dataTransfer.files);
+    files.forEach(file => {
+      if (file.type.startsWith('image/')) {
+        handleFileUpload(file);
+      }
+    });
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFileUpload(e.target.files[0]);
+    const files = Array.from(e.target.files || []);
+    files.forEach(handleFileUpload);
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
-  const removeImage = (index: number) => {
-    const newImages = uploadedImages.filter((_, i) => i !== index);
-    setUploadedImages(newImages);
-    const latestImage =
-      newImages.length > 0 ? newImages[newImages.length - 1] : "";
-    onImageUploaded(latestImage, newImages);
+  const removeImage = (imageId: string) => {
+    const imageToRemove = images.find(img => img.id === imageId);
+    if (imageToRemove) {
+      // Clean up blob URL
+      if (imageToRemove.url.startsWith('blob:')) {
+        URL.revokeObjectURL(imageToRemove.url);
+      }
+      
+      // Remove from queue if it's still there
+      if (imageToRemove.file) {
+        setUploadQueue(prev => prev.filter(file => file !== imageToRemove.file));
+      }
+    }
+    
+    setImages(prev => prev.filter(img => img.id !== imageId));
+  };
+
+  const clearAllImages = () => {
+    // Clean up any blob URLs
+    images.forEach(img => {
+      if (img.url.startsWith('blob:')) {
+        URL.revokeObjectURL(img.url);
+      }
+    });
+    
+    // Clear upload queue
+    setUploadQueue([]);
+    setImages([]);
   };
 
   const openFileDialog = () => {
     fileInputRef.current?.click();
   };
+
+  const getStatusIcon = (status: UploadedImage['status']) => {
+    switch (status) {
+      case 'uploading':
+        return <Clock className="h-4 w-4 text-blue-500 animate-spin" />;
+      case 'completed':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'error':
+        return <X className="h-4 w-4 text-red-500" />;
+    }
+  };
+
+  const completedImages = images.filter(img => img.status === 'completed');
+  const uploadingImages = images.filter(img => img.status === 'uploading');
+  const hasErrors = images.some(img => img.status === 'error');
+  const queueLength = uploadQueue.length;
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -212,38 +303,79 @@ export default function ImageUpload({
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        multiple
         onChange={handleFileInput}
         className="hidden"
       />
 
       {/* Image Preview Grid */}
-      {uploadedImages.length > 0 && (
+      {images.length > 0 && (
         <div className="space-y-3">
-          <Label className="text-sm text-gray-600">
-            Uploaded Images ({uploadedImages.length})
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm text-gray-600">
+              Images ({completedImages.length} completed, {images.length} total)
+              {queueLength > 0 && ` • ${queueLength} in queue`}
+            </Label>
+            <div className="flex items-center gap-2">
+              {uploadingImages.length > 0 && (
+                <span className="text-xs text-blue-500">
+                  {uploadingImages.length} uploading...
+                </span>
+              )}
+              {hasErrors && (
+                <span className="text-xs text-red-500">Some uploads failed - click retry</span>
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {uploadedImages.map((imageUrl, index) => (
-              <div key={index} className="relative group">
+            {images.map((image, index) => (
+              <div key={image.id} className="relative group">
                 <img
-                  src={imageUrl}
+                  src={image.url}
                   alt={`Product image ${index + 1}`}
-                  className="w-full h-24 object-cover rounded-lg border-2 border-gray-200 group-hover:border-blue-300 transition-colors"
+                  className={`w-full h-24 object-cover rounded-lg border-2 transition-all ${
+                    image.status === 'completed' 
+                      ? 'border-green-200 group-hover:border-green-300' 
+                      : image.status === 'error'
+                      ? 'border-red-200 group-hover:border-red-300'
+                      : 'border-blue-200 group-hover:border-blue-300'
+                  }`}
                   onError={(e) => {
-                    console.error("❌ Failed to load image:", imageUrl);
-                    e.currentTarget.style.display = "none";
+                    console.error("Failed to load image:", image.url);
                   }}
                 />
+                
+                {/* Status indicator */}
+                <div className="absolute top-1 left-1 bg-white bg-opacity-90 rounded-full p-1">
+                  {getStatusIcon(image.status)}
+                </div>
+                
+                {/* Remove button */}
                 <Button
                   type="button"
                   variant="destructive"
                   size="sm"
                   className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
-                  onClick={() => removeImage(index)}
+                  onClick={() => removeImage(image.id)}
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3 w-3 text-white" />
                 </Button>
-                <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                
+                {/* Retry button for failed uploads */}
+                {image.status === 'error' && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="absolute bottom-1 left-1 right-1 h-6 text-xs"
+                    onClick={() => retryUpload(image.id)}
+                  >
+                    Retry
+                  </Button>
+                )}
+                
+                {/* Image number */}
+                <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
                   {index + 1}
                 </div>
               </div>
@@ -267,58 +399,50 @@ export default function ImageUpload({
         <ImageIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <div className="space-y-2">
           <p className="text-sm text-gray-600">
-            Drag and drop an image here, or{" "}
+            Drag and drop images here, or{" "}
             <button
               type="button"
               onClick={openFileDialog}
               className="text-blue-600 hover:text-blue-500 font-medium"
-              disabled={isUploading}
             >
               browse
             </button>
           </p>
           <p className="text-xs text-gray-500">
-            Supports: JPEG, PNG, WebP, GIF (max 10MB)
+            Supports: JPEG, PNG, WebP, GIF (max 10MB each)
           </p>
-          {uploadedImages.length > 0 && (
+          {completedImages.length > 0 && (
             <p className="text-xs text-green-600">
-              ✓ {uploadedImages.length} image(s) uploaded
+              ✓ {completedImages.length} image(s) ready
             </p>
           )}
-          {isUploading && (
-            <p className="text-xs text-blue-600">🔄 Uploading...</p>
+          {queueLength > 0 && (
+            <p className="text-xs text-blue-600">
+              🔄 {queueLength} image(s) in upload queue
+            </p>
           )}
         </div>
       </div>
 
-      {/* Upload Button */}
+      {/* Upload Controls */}
       <div className="flex flex-wrap gap-2 items-center justify-center">
         <Button
           type="button"
           onClick={openFileDialog}
-          disabled={isUploading}
-          className="w-1/3"
+          className="flex-1 min-w-[120px]"
         >
           <Upload className="h-4 w-4 mr-2" />
-          {isUploading
-            ? "Uploading..."
-            : uploadedImages.length == 0
-            ? "Upload Image"
-            : "Add More Images"}
+          {images.length === 0 ? "Upload Images" : "Add More Images"}
         </Button>
 
-        {/* Clear All Button */}
-        {uploadedImages.length > 0 && (
+        {images.length > 0 && (
           <Button
             type="button"
-            onClick={() => {
-              setUploadedImages([]);
-              onImageUploaded("", []);
-            }}
-            className="w-1/3"
+            onClick={clearAllImages}
+            className="flex-1 min-w-[120px] bg-red-700"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Clear All Images
+            Clear All
           </Button>
         )}
       </div>
