@@ -9,11 +9,27 @@ export default function Hero() {
                 style={{
                     height: "90vh",
                     borderRadius: "20px",
-                    backgroundImage: "url('/bg.webp')",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
+                    position: "relative",
+                    overflow: "hidden",
                 }}
             >
+                <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "20px",
+                    }}
+                >
+                    <source src="/video/demo1.mp4" type="video/mp4" />
+                </video>
                 {/* Overlay for darkening the image, optional */}
                 <div
                     style={{
@@ -30,6 +46,7 @@ export default function Hero() {
                         justifyContent: "center",
                         color: "white",
                         textAlign: "center",
+                        backgroundColor: "rgba(0, 0, 0, 0.7)",
                     }}
                 >
                     <Highlight className="mb-2 sm:mb-4 text-xs sm:text-sm md:text-base" text="EMPOWERING QUALITY SERVICE SINCE 2008" />
@@ -51,7 +68,7 @@ export default function Hero() {
                             asChild
                             size="sm">
                             <Link href="/products">
-                                <span>View Products</span>
+                                <span >View Products</span>
                             </Link>
                         </Button>
                         <Button

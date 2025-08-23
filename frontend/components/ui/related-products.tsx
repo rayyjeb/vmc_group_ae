@@ -177,11 +177,11 @@ const RelatedProducts = ({
                     {/* Content */}
                     <div className="flex flex-col justify-between p-4 flex-1">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand transition-colors text-sm">
+                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand transition-colors">
                           {productName}
                         </h3>
 
-                        <p className="text-gray-600 line-clamp-2 mb-3 text-xs">
+                        <p className="text-custom-text-200 font-light line-clamp-2 mb-3 text-sm">
                           {productDescription}
                         </p>
                       </div>

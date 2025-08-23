@@ -175,7 +175,7 @@ const ServicesNew = () => {
                             <div className='flex flex-col justify-between w-full lg:w-1/2 p-2 lg:p-4 pt-2 lg:pt-8 order-2 lg:order-1'>
                                 <div>
                                     <motion.h3
-                                        className='text-3xl text-left font-medium mb-2 tracking-tighter'
+                                        className='text-2xl lg:text-3xl text-left font-medium mb-2 tracking-tighter'
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ duration: 0.6 }}

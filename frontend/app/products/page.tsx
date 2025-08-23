@@ -197,15 +197,15 @@ const ProductsPageContent = () => {
         <div className="container mx-auto px-4 py-12 sm:px-6 pt-28 font-Urbanist">
           <div className="flex justify-between items-center">
             <div className="mb-8">
-              <h1 className="text-5xl tracking-tighter font-DIN transition-all duration-300">
+              <h1 className="text-4xl lg:text-5xl tracking-tighter transition-all duration-300">
                 {getCategoryName(activeCategory)}
               </h1>
-              <p className="text-muted-foreground mt-2 transition-all duration-300">
+              <p className="text-custom-text-200 text-sm lg:text-base font-light mt-2 transition-all duration-300">
                 {activeCategory
                   ? `Browse our complete collection of ${getCategoryName(activeCategory)?.toLowerCase() ||
                   "products"
                   }`
-                  : "Browse our complete collection of professional tools and equipment"}
+                  : "Browse our complete collection of products"}
               </p>
               {(activeCategory || debouncedSearchQuery) && (
                 <div className="mt-2">

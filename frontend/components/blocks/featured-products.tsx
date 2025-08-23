@@ -269,7 +269,7 @@ const FeaturedProducts = ({
             <Button
               variant="default"
               size="sm"
-              className="bg-white hover:bg-[#92C33E]/20 hover:text-white border-2 border-brand text-brand transition-all duration-300 px-8 py-3 text-lg font-medium"
+              className="bg-white hover:bg-[#92C33E]/20 hover:text-white border-2 border-brand text-brand transition-all duration-300 px-8 py-3 text-sm  font-medium"
             >
               View All Products
               <ChevronRight className="ml-2 h-5 w-5" />
