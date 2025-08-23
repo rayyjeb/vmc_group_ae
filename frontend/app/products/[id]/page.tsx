@@ -84,7 +84,7 @@ const ProductPage = () => {
                 <div className="container mx-auto px-4 py-12 sm:px-6 pt-28 font-Urbanist">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         {/* Product Image */}
-                        <div className="space-y-4">
+                        <div className="order-2 hidden lg:block lg:order-1 space-y-4">
                             <div className="aspect-square rounded-lg overflow-hidden bg-muted">
                                 <Image
                                     src={product.image}
@@ -96,9 +96,10 @@ const ProductPage = () => {
                             </div>
                         </div>
 
-                        {/* Product Info */}
-                        <div className="animate-slide-in">
-                            <div className="flex items-center space-x-2 mb-2">
+                        {/* Product Info - All content in one column on desktop */}
+                        <div className="animate-slide-in order-1 lg:order-2 space-y-6">
+                            {/* Badges - Mobile First */}
+                            <div className="flex items-center space-x-2 mb-4">
                                 <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
                                     {typeof product.category === 'string'
                                         ? product.category.split('-').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
@@ -120,7 +121,17 @@ const ProductPage = () => {
                                     {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                                 </div>
                             </div>
-
+                            <div className="lg:hidden">
+                                <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                                    <Image
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="object-cover w-full h-full"
+                                        width={256}
+                                        height={256}
+                                    />
+                                </div>
+                            </div>
                             <Separator className="my-6" />
 
                             <div className="mt-4">
