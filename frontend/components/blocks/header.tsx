@@ -9,6 +9,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useCart } from "@/context/CartContext"
 const menuItems = [
+    { name: 'Home', href: '/' },
     { name: 'Products', href: '/products' },
     { name: 'Brands', href: '/brands' },
     { name: 'Services', href: '/services' },
