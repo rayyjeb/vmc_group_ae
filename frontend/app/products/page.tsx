@@ -245,7 +245,7 @@ const ProductsPage = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="mb-8">
+            <div className="hidden md:block mb-8">
               <div className="relative max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
@@ -322,7 +322,7 @@ const ProductsPage = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 stagger-animate">
+              <div className="grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 stagger-animate">
                 {currentProducts.map((product: Product) => {
                   // Handle both _id and id fields
                   const productId = product.id || product._id;

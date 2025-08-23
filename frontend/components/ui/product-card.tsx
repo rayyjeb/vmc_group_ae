@@ -1,6 +1,6 @@
 "use client"
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Star, ShoppingCart, Check } from 'lucide-react';
+import { ShoppingCart, Check } from 'lucide-react';
 import { Button } from './button';
 import { Product } from '@/types/products';
 import Link from 'next/link';
@@ -28,7 +28,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
     const productName = product.name || 'Product Name';
     const productDescription = product.description || 'No description available';
     const productImage = product.image || '/placeholder-image.jpg';
-    const productRating = product.rating || 0;
     const productStock = product.stock || 0;
     const isFeatured = product.featured || false;
 
@@ -64,9 +63,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
                             </div>
                         </div> */}
 
-                        <h3 className="font-medium mt-1">{productName}</h3>
+                        <h3 className="font-medium mt-1 text-sm sm:text-base">{productName}</h3>
 
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-3 flex-1">{productDescription}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-3 flex-1">{productDescription}</p>
                     </CardContent>
 
                     <CardFooter className="px-4 pb-4 pt-0 flex-shrink-0">
@@ -79,17 +78,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         >
                             {isInCart ? (
                                 <>
-                                    <Check className="h-4 w-4 mr-2" />
+                                    <Check className="size-3 sm:size-4 mr-2" />
                                     Added
                                 </>
                             ) : productStock === 0 ? (
                                 <>
-                                    <ShoppingCart className="h-4 w-4 mr-2" />
+                                    <ShoppingCart className="size-3 sm:size-4 mr-2" />
                                     Out of Stock
                                 </>
                             ) : (
                                 <>
-                                    <ShoppingCart className="h-4 w-4 mr-2" />
+                                    <ShoppingCart className="size-3 sm:size-4 mr-2" />
                                     Add to Cart
                                 </>
                             )}

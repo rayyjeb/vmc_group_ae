@@ -1,7 +1,7 @@
 "use client"
 import { useEffect } from 'react';
 import { useProduct, useProductsByCategory } from '@/lib/queries';
-import { Star, Check, ShoppingCart } from 'lucide-react';
+import { Check, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import ShareButton from '@/components/ui/share';
 import { useParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
+import { Product } from '@/types/products';
 
 const ProductPage = () => {
     const params = useParams();
@@ -81,7 +82,7 @@ const ProductPage = () => {
 
     // Filter out current product and limit related products
     const filteredRelatedProducts = relatedProducts
-        .filter(item => item.id !== productId)
+        .filter((item: { id: string }) => item.id !== productId)
         .slice(0, 4);
 
     return (
@@ -121,21 +122,6 @@ const ProductPage = () => {
                             </div>
 
                             <h1 className="text-3xl font-bold tracking-tight font-Urbanist">{product.name}</h1>
-
-                            <div className="flex items-center mt-4">
-                                <div className="flex items-center">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star
-                                            key={i}
-                                            className={`h-5 w-5 ${i < Math.floor(product.rating || 0) ? 'fill-amber-400 text-amber-400' : i < (product.rating || 0) ? 'fill-amber-400/50 text-amber-400/50' : 'text-gray-300'}`}
-                                        />
-                                    ))}
-                                </div>
-                                <span className="ml-2 text-muted-foreground">
-                                    {(product.rating || 0).toFixed(1)} rating
-                                </span>
-                            </div>
-
                             <div className="mt-4">
                                 <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                     {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
@@ -183,7 +169,7 @@ const ProductPage = () => {
                         <div className="mt-16">
                             <h2 className="text-2xl font-bold mb-6">Related Products</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                {filteredRelatedProducts.map(relatedProduct => (
+                                {filteredRelatedProducts.map((relatedProduct: Product) => (
                                     <ProductCard key={relatedProduct.id} product={relatedProduct} />
                                 ))}
                             </div>
