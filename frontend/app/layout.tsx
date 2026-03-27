@@ -8,6 +8,7 @@ import QueryProvider from "@/components/providers/query-provider";
 import CartDrawer from "@/components/ui/cart-drawer";
 import Footer4Col from "@/components/mvpblocks/footer-4col";
 import PageLoader from "@/components/ui/page-loader";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-4S3V3CJCN4"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-4S3V3CJCN4');
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <PageLoader />
         <QueryProvider>
